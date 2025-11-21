@@ -1,0 +1,37 @@
+# Configurações de segurança específicas para a API
+<IfModule mod_headers.c>
+    # Cabeçalhos de segurança para API
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Content-Security-Policy "default-src 'none'"
+    
+    # Rate limiting básico via headers
+    Header always set X-RateLimit-Limit "100"
+    Header always set X-RateLimit-Window "3600"
+</IfModule>
+
+# Bloquear acesso direto a arquivos que não sejam PHP
+<FilesMatch "^(?!.*\.php$).*$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Configurações PHP para segurança
+<IfModule mod_php.c>
+    php_flag display_errors Off
+    php_flag log_errors On
+    php_value error_log /tmp/php_errors.log
+    php_flag expose_php Off
+    php_value max_execution_time 30
+    php_value max_input_time 30
+    php_value memory_limit 64M
+    php_value post_max_size 1M
+    php_value upload_max_filesize 1M
+</IfModule>
+
+# Bloquear métodos HTTP desnecessários
+<LimitExcept GET POST OPTIONS>
+    Order allow,deny
+    Deny from all
+</LimitExcept>
